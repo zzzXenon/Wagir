@@ -1,0 +1,624 @@
+(defun day(D)
+    (car D)
+)
+
+
+(defun month(D)
+    (car (cdr D))
+)
+
+
+(defun year(D)
+    (car (cdr (cdr D)))
+)
+
+
+(defun isKabisat(yy) ;menentukan jika sebuah tahun kabisat
+    (or
+        (and
+            (= (mod yy 4)0)
+            (/= (mod yy 100)0)
+        )
+                   
+        (= (mod yy 400)0)
+    )                                
+)
+
+
+(defun month31 (mm) ;menentukan jika pada bulan dengan 31 hari
+    (or
+        (= mm 1) (= mm 3)
+        (= mm 5) (= mm 7)
+        (= mm 8) (= mm 10)
+        (= mm 12)
+    )
+)
+
+
+(defun month30 (mm) ;menentukan jika pada bulan dengan 30 hari
+    (or
+        (= mm 4) (= mm 11)
+        (= mm 9) (= mm 6)
+       
+    )
+)
+
+
+(defun make-date (dd mm yy) ;konstuktor
+    (cond
+        (
+         (if ;mengkonstruksi tipe data pada bulan dengan 31 hari
+            (and
+                (<= dd 31)
+                (> dd 0)
+                (> yy 0)
+                (month31 mm)
+            )        
+            (cons dd (cons mm (cons yy nil)))
+         )
+        )  
+        (
+         (if ;mengkonstruksi tipe data pada bulan dengan 30 hari
+            (and
+                (<= dd 30)
+                (> dd 0)
+                (> yy 0)
+                (month30 mm)
+            )
+            (cons dd (cons mm (cons yy nil)))
+         )
+        )
+        (
+         (if ;mengkonstruksi tipe data pada bulan dengan 29 hari (tahun kabisat)
+            (and
+                (<= dd 29)
+                (> dd 0)
+                (> yy 0)
+                (and
+                    (= mm 2)
+                    (isKabisat yy)
+                )
+            )
+            (cons dd (cons mm (cons yy nil)))
+         )
+        )        
+       
+        (
+         (if ;mengkonstruksi tipe data pada bulan dengan 28 hari
+            (and
+                (<= dd 28)
+                (> dd 0)
+                (> yy 0)
+                (= mm 2)
+            )        
+            (cons dd (cons mm (cons yy nil)))
+         )
+        )
+    )
+
+
+)
+(defun nextDay (d) ;memajukan satu hari kedepan
+    (cond
+        (
+         (if ;memajukan satu hari saat hari sebelum tanggal 31 pada bulan dengan 31 hari
+            (and
+                (< (day d) 31)
+                (month31 (month d))
+            )      
+            (list
+                (+ (day d) 1)
+                (month d)
+                (year d)
+            )
+         )
+        )  
+
+
+        (
+         (if ;memajukan satu hari saat hari pada tanggal 31 pada bulan dengan 31 hari
+            (and
+                (= (day d) 31)
+                (/= (month d) 12)
+                (month31 (month d))
+            )        
+
+
+            (list
+                (- (day d) 30)
+                (+ (month d) 1)
+                (year d)
+            )
+         )
+        )
+        (
+         (if ;memajukan satu hari saat hari terakhir suatu tahun
+            (and
+                (= (day d) 31)
+                (= (month d) 12)
+                (month31 (month d))
+            )        
+            (list
+                (- (day d) 30)
+                (- (month d) 11)
+                (+ (year d) 1)
+            )
+         )
+        )
+
+
+        (
+         (if ;memajukan satu hari saat hari sebelum tanggal 30 pada bulan dengan 30 hari
+            (and
+                (< (day d) 30)
+                (month30 (month d))
+            )        
+            (list
+                (+ (day d) 1)
+                (month d)
+                (year d)
+            )
+         )
+        )
+
+
+        (
+         (if ;memajukan satu hari saat hari pada tanggal 30 pada bulan dengan 30 hari
+            (and
+                (= (day d) 30)
+                (month30 (month d))
+            )        
+            (list
+                (- (day d) 29)
+                (+ (month d) 1)
+                (year d)
+            )
+        )
+       )
+       
+       (
+        (if ;memajukan satu hari saat hari sebelum tanggal 29 pada bulan dengan 29 hari pada tahun kabisat
+            (and
+                 (< (day d) 29)
+                 (and
+                    (= (month d)2)
+                    (iskabisat (Year d))
+                 )      
+            )
+
+
+            (list
+                (+ (day d) 1)
+                (month d)
+                (year d)
+            )
+        )
+       )
+   
+        (
+         (if ;memajukan satu hari saat hari pada tanggal 29 pada bulan dengan 29 hari pada tahun kabisat
+            (and
+                (= (day d) 29)
+                (and
+                    (= (month d) 2)
+                    (iskabisat (year d))
+                )    
+            )        
+            (list
+                (- (day d) 28)
+                (+ (month d) 1)
+                (year d)
+            )
+         )
+        )
+
+
+        (
+         (if ;memajukan satu hari saat hari sebelum tanggal 28 pada bulan dengan 28 hari
+            (and
+                (< (day d) 28)
+                (= (month d) 2)
+            )        
+            (list
+                (+ (day D) 1)
+                (month d)
+                (year d)
+            )
+         )
+        )
+   
+        (
+         (if ;memajukan satu hari saat hari pada tanggal 28 pada bulan dengan 28 hari
+            (and
+                (= (day d) 28)
+                (= (month d) 2)
+            )        
+            (list
+                (- (day d) 27)
+                (+ (month d) 1)
+                (year d)
+            )
+         )
+        )
+    )
+)
+
+
+(defun yesterday (d)
+    (cond
+        (
+         (if ;memundurkan satu hari saat hari melewati tanggal 1
+            (and
+                (> (day d) 1))
+            (list
+                (- (day d) 1)
+                (month d)
+                (year d)
+            )
+         )
+        )
+
+
+        (
+         (if ;memundurkan satu hari pertama tahun baru
+            (and
+                (= (day d) 1)
+                (= (month d) 1)
+            )
+            (list
+                (+ (day d) 30)
+                (+ (month d) 11)
+                (- (year d)1 )
+            )
+         )
+        )    
+
+
+        (
+         (if ;memundurkan satu hari pada hari pertama bulan dengan 31 hari
+            (and
+                (= (day d) 1)
+                (month31 (- (month d) 1))
+            )         .
+            (list
+                (+ (day d) 30)
+                (- (month d) 1)
+                (year d)
+            )
+         )
+        )
+   
+        (
+         (if ;memundurkan satu hari pada hari pertama bulan dengan 30 hari
+            (and
+                (= (day d) 1)
+                (month30 (- (month d) 1))
+            )    
+            (list
+                (+ (day d) 29)
+                (- (month d) 1)
+                (year d)
+            )
+         )
+        )
+
+
+        (
+         (if ;memundurkan satu hari pada hari pertama bulan dengan 29 hari
+            (and
+                (= (day d) 1)
+                (and
+                    (= (month d) 3)
+                    (iskabisat (year d)))
+            )
+            (list
+                (+ (day d) 28)
+                (- (month d) 1)
+                (year d)
+            )
+         )
+        )
+   
+        (
+         (if ;memundurkan satu hari pada hari pertama bulan dengan 28 hari
+            (and
+                (= (day d) 1)
+                (= (month d) 3 )
+            )        
+            (list
+                (+ (day d) 27)
+                (- (month d) 1)
+                (year d)
+            )
+         )
+        )
+    )
+)
+
+
+(defun isEqD(d1 d2) ;memeriksa jika dua tanggal sama
+    (and
+        (= (day d1) (day d2))
+        (= (month d1) (month d2))    
+        (= (year d1) (year d2))
+    )
+)
+
+
+(defun isBefore (d1 d2) ;memeriksa jika tanggal pertama sebelum tanggal kedua
+   
+    (or
+        (< (year d1) (year d2))
+        (and
+            (= (year d1) (year d2))
+            (< (month d1)(month d2))
+        )
+
+
+        (and
+            (= (year d1) (year d2))
+            (= (month d1)(month d2))
+            (< (day d1) (day d2))
+        )        
+    )
+)
+
+(defun JumlahSukuKeN (a n)
+    (cond
+        ((= n 1) a)
+        (t(+ a (jumlahSukuKeN (* 2 n) (- n 1))))
+
+
+    )
+)
+
+
+(defun sukuKeN (n)
+    (cond
+        ((= n 1)n)
+        (t(+ (/ 2 (sukuKeN (- n 1))) 3))
+   
+    )
+)
+
+
+(defun sumSquared (L)
+    (cond
+        ((null (car L))0 )
+        (t(+ (fx2 (car L)) (sumSquared (cdr L))))
+    )
+)
+
+
+(defun sumEven (L)
+    (cond
+        ((and
+            (/= (mod (car L) 2 )0)
+            (null (cdr L)))
+                nil)
+        ((and
+            (= (mod (car L) 2 ) 0)
+            (null (cdr L)))
+                (car L))
+        ((= (mod (car L) 2) 0) (+ (car L) (sumEven (cdr L) )))
+        ((/= (mod (car L) 2) 0) (sumEven (cdr L) ))
+    )
+)
+
+
+(defun absis(P)
+    (car P)
+)
+
+
+(defun ordinat(P)
+    (car (cdr P))
+)
+
+
+(defun makePoint (x y)
+    (cons x (cons y nil))
+)
+
+
+(defun jarak(P1 P2)
+    (setq A (fx2 (- (absis P1)(absis P2))))
+    (setq B (fx2 (- (ordinat P1)(ordinat P2))))
+    (sqrt (+ A B))
+)
+
+
+(defun fx2(x)
+    (* x x)
+)
+
+
+(defun isSamaKaki (p1 p2 p3)
+    (or
+        (and
+            (= (ordinat p1) (ordinat p2))
+            (= (jarak p1 p3) (jarak p2 p3))
+           
+        )
+        (and
+            (= (ordinat p2) (ordinat p3))
+            (= (jarak p1 p2) (jarak p1 p3))
+           
+        )
+        (and
+            (= (ordinat p1) (ordinat p3))
+            (= (jarak p1 p2) (jarak p2 p3))
+        )
+   
+    )
+)
+
+
+(defun akar (P)
+    (car P)
+)
+
+
+(defun left (P)
+    (car (cdr P))
+)
+
+
+(defun right (P)
+    (car (cdr (cdr P)))
+)
+
+
+
+
+(defun isOneElement(P)  
+    (or
+        (atom P)
+        (and
+            (not (null (akar P)))
+            (null (left P))
+            (null (right P))
+        )
+    )
+)
+
+
+(defun isOneElement(P)
+    (or (atom P)
+        (= (length P) 1)
+    )
+)
+
+
+(defun nbDaun (P)
+    (cond
+        ((isOneElement P) 1)
+        ((null P) 0)
+        (t(+ (nbDaun (left P)) (nbDaun (Right P))))
+    )
+)
+
+
+(defun absol(x)
+    (cond
+      ((> x 0)x)                    ;Jika x lebih besar dari 0 kembalikan x
+      ((= x 0)0)                    ;Jika x 0 kembalikan 0
+      (t(- x))                      ;Jika x lebih kecil dari 0 kembalikan -x
+    )
+)
+
+
+
+
+(defun makePersegi (p1 p2)
+    (cons p1 (cons p2 nil))
+)
+
+
+(defun getpoint1 (P)
+    (car P)
+)
+(defun getpoint2 (P)
+    (car (cdr P))
+)
+
+
+(defun LuasPersegi (p1 p2)
+    (* (absol (- (absis p1) (absis p2) )) (absol (- (ordinat p1) (ordinat p2))))
+)
+
+
+(defun isValid (p1 p2)
+    (and (/= (absis p1) (absis p2))
+         (/= (ordinat p1) (ordinat p2))
+    )
+)
+
+
+(defun nbElement (P)
+    (cond
+        ((isTreeEmpty P) 0)
+        ((isOneElement P) 1)
+
+
+        ((isUnerleft P) (+ 1 (nbElement (left P))))
+       
+        ((isUnerRight P) (+ 1 (nbElement (right P))))
+       
+        ((isBiner P) (+ 1 (nbElement (left P)) (nbElement (Right P))))
+    )
+)
+
+
+
+
+(defun nbDaun(P)
+    (cond
+        ((isTreeEmpty P) 0)
+        ((isOneElement P) 1)
+        (t (+ (nbDaun (left P)) (nbDaun (right P))))
+    )
+)
+
+
+(defun repPrefix(P)
+    (cond ((null P) nil)
+       
+          ((atom P) (list P))
+       
+          (t (append (list (akar P))
+                   (repPrefix (left P))
+                   (repPrefix (right P))))
+    )
+)
+
+
+; Predikat
+(defun isTreeEmpty(P)
+    (null P)
+)
+
+
+(defun isOneElement(P)
+    (or (atom P)
+        (= (length P) 1)
+    )
+)
+
+
+(defun isUnerLeft(P)
+    (and (not (null P))
+        (not (null (left P)))
+        (null (right P))
+    )
+)
+
+
+(defun isUnerRight(P)
+    (and (not (null P))
+        (not (null (right P)))
+        (null (left P)))
+)
+
+
+(defun isBiner(P)
+    (and (not (null P))
+        (not (null (left P)))
+        (not (null (right P)))
+    )
+)
+
+
+(defun isExitLeft(P)
+    (and (not (null P))
+        (not (null (left P)))
+    )
+)
+
+
+(defun isExitRight(P)
+    (and (not (null P))
+        (not (null (right P)))
+    )
+)
+
